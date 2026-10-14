@@ -68,10 +68,11 @@ func resourceNetboxDeviceModuleBayCreate(d *schema.ResourceData, m interface{}) 
 		return err
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimModuleBaysCreateParams().WithData(&data)
 
@@ -144,10 +145,11 @@ func resourceNetboxDeviceModuleBayUpdate(d *schema.ResourceData, m interface{}) 
 		return err
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimModuleBaysPartialUpdateParams().WithID(id).WithData(&data)
 

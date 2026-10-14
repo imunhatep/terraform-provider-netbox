@@ -117,10 +117,11 @@ func resourceNetboxPowerFeedCreate(d *schema.ResourceData, m interface{}) error 
 		return err
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimPowerFeedsCreateParams().WithData(&data)
 
@@ -236,10 +237,11 @@ func resourceNetboxPowerFeedUpdate(d *schema.ResourceData, m interface{}) error 
 		return err
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimPowerFeedsPartialUpdateParams().WithID(id).WithData(&data)
 

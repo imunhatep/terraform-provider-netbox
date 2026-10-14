@@ -149,12 +149,12 @@ func resourceNetboxPrefixCreate(d *schema.ResourceData, m interface{}) error {
 		data.ScopeID = nil
 	}
 
-	cf, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = cf
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
-	var err error
 	data.Tags, err = getNestedTagListFromResourceDataSet(api, d.Get(tagsAllKey))
 	if err != nil {
 		return err
@@ -289,9 +289,11 @@ func resourceNetboxPrefixUpdate(d *schema.ResourceData, m interface{}) error {
 		data.Role = int64ToPtr(int64(roleID.(int)))
 	}
 
-	if cf := getCustomFieldsForUpdate(d); cf != nil {
-		data.CustomFields = cf
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	siteID := getOptionalInt(d, "site_id")
 	siteGroupID := getOptionalInt(d, "site_group_id")
@@ -316,7 +318,6 @@ func resourceNetboxPrefixUpdate(d *schema.ResourceData, m interface{}) error {
 		data.ScopeID = nil
 	}
 
-	var err error
 	data.Tags, err = getNestedTagListFromResourceDataSet(api, d.Get(tagsAllKey))
 	if err != nil {
 		return err

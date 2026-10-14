@@ -68,10 +68,11 @@ func resourceNetboxCircuitProviderNetworkCreate(d *schema.ResourceData, m interf
 		return err
 	}
 
-	cf, ok := d.GetOk("custom_fields")
-	if ok {
-		data.CustomFields = cf
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := circuits.NewCircuitsProviderNetworksCreateParams().WithData(&data)
 
@@ -134,12 +135,12 @@ func resourceNetboxCircuitProviderNetworkUpdate(d *schema.ResourceData, m interf
 	data.Provider = &provider
 	data.ServiceID = d.Get("service_id").(string)
 
-	cf, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = cf
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
-	var err error
 	data.Tags, err = getNestedTagListFromResourceDataSet(api, d.Get(tagsAllKey))
 	if err != nil {
 		return err

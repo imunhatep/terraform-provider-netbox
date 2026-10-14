@@ -93,10 +93,11 @@ func resourceNetboxDevicePowerOutletCreate(d *schema.ResourceData, m interface{}
 		return err
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimPowerOutletsCreateParams().WithData(&data)
 
@@ -199,10 +200,11 @@ func resourceNetboxDevicePowerOutletUpdate(d *schema.ResourceData, m interface{}
 		return err
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimPowerOutletsPartialUpdateParams().WithID(id).WithData(&data)
 

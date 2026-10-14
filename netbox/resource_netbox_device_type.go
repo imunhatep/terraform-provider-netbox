@@ -116,10 +116,11 @@ func resourceNetboxDeviceTypeCreate(d *schema.ResourceData, m interface{}) error
 		return err
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimDeviceTypesCreateParams().WithData(&data)
 
@@ -223,10 +224,11 @@ func resourceNetboxDeviceTypeUpdate(d *schema.ResourceData, m interface{}) error
 		return err
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimDeviceTypesPartialUpdateParams().WithID(id).WithData(&data)
 

@@ -76,9 +76,11 @@ func resourceNetboxWirelessLANGroupCreate(d *schema.ResourceData, m interface{})
 		return err
 	}
 
-	if cf, ok := d.GetOk(customFieldsKey); ok {
-		data.CustomFields = cf
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := wireless.NewWirelessWirelessLanGroupsCreateParams().WithData(data)
 	res, err := api.Wireless.WirelessWirelessLanGroupsCreate(params, nil)
@@ -158,9 +160,11 @@ func resourceNetboxWirelessLANGroupUpdate(d *schema.ResourceData, m interface{})
 		return err
 	}
 
-	if cf := getCustomFieldsForUpdate(d); cf != nil {
-		data.CustomFields = cf
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := wireless.NewWirelessWirelessLanGroupsPartialUpdateParams().WithID(id).WithData(&data)
 	_, err = api.Wireless.WirelessWirelessLanGroupsPartialUpdate(params, nil, hackSerializeWirelessAsNull(nullFields...))

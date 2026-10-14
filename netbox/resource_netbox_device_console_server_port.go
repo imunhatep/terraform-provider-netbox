@@ -84,10 +84,11 @@ func resourceNetboxDeviceConsoleServerPortCreate(d *schema.ResourceData, m inter
 		return err
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimConsoleServerPortsCreateParams().WithData(&data)
 
@@ -181,10 +182,11 @@ func resourceNetboxDeviceConsoleServerPortUpdate(d *schema.ResourceData, m inter
 		return err
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimConsoleServerPortsPartialUpdateParams().WithID(id).WithData(&data)
 

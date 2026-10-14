@@ -108,10 +108,11 @@ func resourceNetboxMACAddressCreate(d *schema.ResourceData, m interface{}) error
 		return err
 	}
 
-	cf, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = cf
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimMacAddressesCreateParams().WithData(&data)
 
@@ -217,10 +218,11 @@ func resourceNetboxMACAddressUpdate(d *schema.ResourceData, m interface{}) error
 		return err
 	}
 
-	cf, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = cf
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimMacAddressesPartialUpdateParams().WithID(id).WithData(&data)
 

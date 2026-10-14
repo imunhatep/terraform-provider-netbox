@@ -162,10 +162,11 @@ func resourceNetboxIPAddressCreate(d *schema.ResourceData, m interface{}) error 
 		return err
 	}
 
-	cf, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = cf
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := ipam.NewIpamIPAddressesCreateParams().WithData(&data)
 
@@ -329,9 +330,11 @@ func resourceNetboxIPAddressUpdate(d *schema.ResourceData, m interface{}) error 
 		return err
 	}
 
-	if cf := getCustomFieldsForUpdate(d); cf != nil {
-		data.CustomFields = cf
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := ipam.NewIpamIPAddressesUpdateParams().WithID(id).WithData(&data)
 

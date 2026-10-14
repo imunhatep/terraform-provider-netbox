@@ -126,10 +126,11 @@ func resourceNetboxServiceCreate(d *schema.ResourceData, m interface{}) error {
 
 	data.Ipaddresses = []int64{}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := ipam.NewIpamServicesCreateParams().WithData(&data)
 	res, err := api.Ipam.IpamServicesCreate(params, nil)
@@ -232,12 +233,14 @@ func resourceNetboxServiceUpdate(d *schema.ResourceData, m interface{}) error {
 		data.ParentObjectID = deviceID
 	}
 
-	if cf := getCustomFieldsForUpdate(d); cf != nil {
-		data.CustomFields = cf
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := ipam.NewIpamServicesUpdateParams().WithID(id).WithData(&data)
-	_, err := api.Ipam.IpamServicesUpdate(params, nil)
+	_, err = api.Ipam.IpamServicesUpdate(params, nil)
 	if err != nil {
 		return err
 	}

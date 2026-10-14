@@ -234,12 +234,12 @@ func resourceNetboxDeviceCreate(ctx context.Context, d *schema.ResourceData, m i
 		}
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return diag.FromErr(err)
 	}
+	data.CustomFields = customFields
 
-	var err error
 	data.Tags, err = getNestedTagListFromResourceDataSet(api, d.Get(tagsAllKey))
 	if err != nil {
 		return diag.FromErr(err)
@@ -484,11 +484,12 @@ func resourceNetboxDeviceUpdate(ctx context.Context, d *schema.ResourceData, m i
 		}
 	}
 
-	if cf := getCustomFieldsForUpdate(d); cf != nil {
-		data.CustomFields = cf
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return diag.FromErr(err)
 	}
+	data.CustomFields = customFields
 
-	var err error
 	data.Tags, err = getNestedTagListFromResourceDataSet(api, d.Get(tagsAllKey))
 	if err != nil {
 		return diag.FromErr(err)

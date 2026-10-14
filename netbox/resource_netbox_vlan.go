@@ -99,8 +99,14 @@ func resourceNetboxVlanCreate(d *schema.ResourceData, m interface{}) error {
 	if roleID, ok := d.GetOk("role_id"); ok {
 		data.Role = int64ToPtr(int64(roleID.(int)))
 	}
-	if cf, ok := d.GetOk(customFieldsKey); ok {
-		data.CustomFields = getCustomFields(cf)
+	if cf := getCustomFieldsForUpdate(d); cf != nil {
+		// getCustomFields leaves out the empty values, which this resource
+		// treats as unset.
+		customFields, err := api.typedCustomFields(getCustomFields(cf))
+		if err != nil {
+			return err
+		}
+		data.CustomFields = customFields
 	}
 
 	var err error
@@ -196,8 +202,14 @@ func resourceNetboxVlanUpdate(d *schema.ResourceData, m interface{}) error {
 	if roleID, ok := d.GetOk("role_id"); ok {
 		data.Role = int64ToPtr(int64(roleID.(int)))
 	}
-	if cf, ok := d.GetOk(customFieldsKey); ok {
-		data.CustomFields = getCustomFields(cf)
+	if cf := getCustomFieldsForUpdate(d); cf != nil {
+		// getCustomFields leaves out the empty values, which this resource
+		// treats as unset.
+		customFields, err := api.typedCustomFields(getCustomFields(cf))
+		if err != nil {
+			return err
+		}
+		data.CustomFields = customFields
 	}
 
 	var err error

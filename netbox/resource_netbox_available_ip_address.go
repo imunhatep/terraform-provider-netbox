@@ -233,9 +233,11 @@ func resourceNetboxAvailableIPAddressUpdate(d *schema.ResourceData, m interface{
 	data.DNSName = getOptionalStr(d, "dns_name", false)
 	data.Vrf = getOptionalInt(d, "vrf_id")
 	data.Tenant = getOptionalInt(d, "tenant_id")
-	if cf := getCustomFieldsForUpdate(d); cf != nil {
-		data.CustomFields = cf
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	if interfaceID, ok := d.GetOk("interface_id"); ok {
 		// The other possible type is dcim.interface for devices
@@ -264,7 +266,6 @@ func resourceNetboxAvailableIPAddressUpdate(d *schema.ResourceData, m interface{
 		data.AssignedObjectID = nil
 	}
 
-	var err error
 	data.Tags, err = getNestedTagListFromResourceDataSet(api, d.Get(tagsAllKey))
 	if err != nil {
 		return err

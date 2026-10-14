@@ -123,10 +123,11 @@ func resourceNetboxInventoryItemCreate(d *schema.ResourceData, m interface{}) er
 		return err
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimInventoryItemsCreateParams().WithData(&data)
 
@@ -234,10 +235,11 @@ func resourceNetboxInventoryItemUpdate(d *schema.ResourceData, m interface{}) er
 		return err
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimInventoryItemsPartialUpdateParams().WithID(id).WithData(&data)
 

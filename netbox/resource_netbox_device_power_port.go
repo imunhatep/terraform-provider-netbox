@@ -88,10 +88,11 @@ func resourceNetboxDevicePowerPortCreate(d *schema.ResourceData, m interface{}) 
 		return err
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimPowerPortsCreateParams().WithData(&data)
 
@@ -185,10 +186,11 @@ func resourceNetboxDevicePowerPortUpdate(d *schema.ResourceData, m interface{}) 
 		return err
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimPowerPortsPartialUpdateParams().WithID(id).WithData(&data)
 

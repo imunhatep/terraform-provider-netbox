@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strconv"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
@@ -39,7 +40,11 @@ func customFieldValueToString(value interface{}) string {
 	switch v := value.(type) {
 	case string:
 		return v
-	case float64, int, int64, bool:
+	case float64:
+		// %v would render 1000000 as "1e+06", which neither the update path nor
+		// a configuration comparing against it accepts as an integer.
+		return strconv.FormatFloat(v, 'f', -1, 64)
+	case int, int64, bool:
 		return fmt.Sprintf("%v", v)
 	default:
 		// For complex types (maps, arrays, objects), convert to JSON string
@@ -73,9 +78,11 @@ func getCustomFields(cf interface{}) map[string]interface{} {
 }
 
 // getCustomFieldsForUpdate returns custom fields only when the configuration
-// changed them. NetBox treats custom_fields as a full replacement, so sending
-// values from state during an unrelated partial update can fail validation
-// when the provider's string-based schema does not match NetBox's field type.
+// changed them. NetBox merges the custom_fields it receives into the ones the
+// object already has, so leaving them out keeps every value as it is. Sending
+// them during an unrelated update would resend fields the configuration does
+// not manage: a custom_fields entry in ignore_changes keeps its state value in
+// the plan.
 func getCustomFieldsForUpdate(d *schema.ResourceData) interface{} {
 	if !d.HasChange(customFieldsKey) {
 		return nil

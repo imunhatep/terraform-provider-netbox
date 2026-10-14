@@ -209,9 +209,11 @@ func resourceNetboxIPRangeUpdate(d *schema.ResourceData, m interface{}) error {
 	if err != nil {
 		return err
 	}
-	if cf := getCustomFieldsForUpdate(d); cf != nil {
-		data.CustomFields = cf
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := ipam.NewIpamIPRangesUpdateParams().WithID(id).WithData(&data)
 	_, err = api.Ipam.IpamIPRangesUpdate(params, nil)

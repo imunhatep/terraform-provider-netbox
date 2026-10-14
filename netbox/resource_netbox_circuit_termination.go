@@ -138,10 +138,11 @@ func resourceNetboxCircuitTerminationCreate(d *schema.ResourceData, m interface{
 		return err
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := circuits.NewCircuitsCircuitTerminationsCreateParams().WithData(&data)
 
@@ -287,9 +288,11 @@ func resourceNetboxCircuitTerminationUpdate(d *schema.ResourceData, m interface{
 		return err
 	}
 
-	if cf := getCustomFieldsForUpdate(d); cf != nil {
-		data.CustomFields = cf
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := circuits.NewCircuitsCircuitTerminationsPartialUpdateParams().WithID(id).WithData(&data)
 

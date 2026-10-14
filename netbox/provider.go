@@ -22,6 +22,8 @@ type providerState struct {
 
 	// concurrent access ok, only populated on provider start
 	tagCache map[string]*models.NestedTag
+
+	customFieldTypeCache customFieldTypeCache
 }
 
 // This makes the description contain the default value, particularly useful for the docs

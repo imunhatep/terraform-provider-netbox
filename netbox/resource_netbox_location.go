@@ -103,10 +103,11 @@ func resourceNetboxLocationCreate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimLocationsCreateParams().WithData(&data)
 
@@ -217,9 +218,11 @@ func resourceNetboxLocationUpdate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	if cf := getCustomFieldsForUpdate(d); cf != nil {
-		data.CustomFields = cf
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return err
 	}
+	data.CustomFields = customFields
 
 	params := dcim.NewDcimLocationsPartialUpdateParams().WithID(id).WithData(&data)
 

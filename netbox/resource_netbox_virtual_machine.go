@@ -203,10 +203,11 @@ func resourceNetboxVirtualMachineCreate(ctx context.Context, d *schema.ResourceD
 	}
 
 	data.Tags = tags
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return diag.FromErr(err)
 	}
+	data.CustomFields = customFields
 
 	params := virtualization.NewVirtualizationVirtualMachinesCreateParams().WithData(&data)
 
@@ -425,15 +426,11 @@ func resourceNetboxVirtualMachineUpdate(ctx context.Context, d *schema.ResourceD
 	}
 
 	data.Tags = tags
-	// Custom fields are a full-replacement field in the NetBox API. Do not
-	// resend the values read from state during an unrelated VM update: the
-	// schema represents custom fields as strings, while NetBox validates the
-	// actual field type (for example, integer fields must be JSON numbers).
-	// Sending unchanged values back as strings causes otherwise unrelated
-	// updates to fail with "Value must be an integer".
-	if cf := getCustomFieldsForUpdate(d); cf != nil {
-		data.CustomFields = cf
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return diag.FromErr(err)
 	}
+	data.CustomFields = customFields
 
 	if d.HasChanges("comments") {
 		// check if comment is set

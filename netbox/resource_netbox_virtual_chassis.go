@@ -73,12 +73,12 @@ func resourceNetboxVirtualChassisCreate(ctx context.Context, d *schema.ResourceD
 		data.Comments = comments
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return diag.FromErr(err)
 	}
+	data.CustomFields = customFields
 
-	var err error
 	data.Tags, err = getNestedTagListFromResourceDataSet(api, d.Get(tagsAllKey))
 	if err != nil {
 		return diag.FromErr(err)
@@ -146,12 +146,12 @@ func resourceNetboxVirtualChassisUpdate(ctx context.Context, d *schema.ResourceD
 		data.Domain = domain
 	}
 
-	ct, ok := d.GetOk(customFieldsKey)
-	if ok {
-		data.CustomFields = ct
+	customFields, err := customFieldsPayload(api, d)
+	if err != nil {
+		return diag.FromErr(err)
 	}
+	data.CustomFields = customFields
 
-	var err error
 	data.Tags, err = getNestedTagListFromResourceDataSet(api, d.Get(tagsAllKey))
 	if err != nil {
 		return diag.FromErr(err)
